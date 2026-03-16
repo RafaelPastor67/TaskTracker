@@ -1,19 +1,27 @@
-import { useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom"
+import Login from "./pages/Login"
+import Menu from "./pages/Menu"
+import ProtectedRoute from "./services/ProtectedRoute"
+import Register from "./pages/Register"
 
 function App() {
-  const [data, setData] = useState(null);
-
-  useEffect(() => {
-    fetch("http://localhost:5000")
-      .then(res => res.json())
-      .then(data => setData(data));
-  }, []);
-
   return (
-    <div>
-      <h1>{data?.message}</h1>
-    </div>
-  );
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Login />} /> 
+        <Route path="/register" element={<Register />} />
+        <Route
+          path="/menu"
+          element={
+            <ProtectedRoute>
+              <Menu />
+            </ProtectedRoute>
+          }
+        />
+
+      </Routes>
+    </BrowserRouter>
+  )
 }
 
-export default App;
+export default App
