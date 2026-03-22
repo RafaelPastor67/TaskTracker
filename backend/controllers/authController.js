@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt" // lib que vai encrpitar a senhas e fazer suas validações
 import jwt from "jsonwebtoken" // cria os tokens de autenticação e valida
-import { createUser, findUserByEmail,deleteUser } from "../models/userModel.js"
+import { createUser, findUserByEmail } from "../models/userModel.js"
 import dotenv from "dotenv" // carrrega a palavra secreta do JWT 
 dotenv.config({ path: ".env.example" })// carrrega a palavra secreta do JWT -
 
@@ -38,7 +38,10 @@ export const login = async (req, res) => {
   } 
 
   const token = jwt.sign( // Cria o token com a assinatura que ta sendo puxada do .env de exemplo
-    { email: user.email },
+    { 
+      id: user.id,
+      name:user.name,
+      email: user.email },
     secret,
     { expiresIn: "1h" }
   )
@@ -46,10 +49,6 @@ export const login = async (req, res) => {
   res.json({ token })
 }
 ////////////////////////////////
-
-export function deletarUsuario(email){ // NAO TA PRONTO
-    deleteUser(email)
-  }
 
 
 

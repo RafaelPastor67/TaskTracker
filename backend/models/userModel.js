@@ -1,6 +1,4 @@
 import db from "../database/configdb.js"
-import { AdicionaUsuario } from "../database/querys.js"
-
 
 export const createUser = (user) => {
   AdicionaUsuario(user)
@@ -22,13 +20,12 @@ export async function findUserByEmail(email){
 }
 
 export function deleteUser(email){
-    db.query("DELETE FROM users WHERE email = ?",[email],(err)=>{
-        if (err){
-            console.error("Não foi possível excluir usuario: ", err)
-            return
-        }
-        else{console.log("Usuário deletado")}
+  return new Promise((resolve,reject)=> {
+    db.query("DELETE FROM users WHERE email = ?",[email],(err,result) => {
+      if (err) return reject(err)
+      resolve(result)
     })
+  })
 }
 
 // export const findUserByEmail = (email) => { Desse jeito nao vai funcionar pq o return vai ser so do callback, terrei q fazer async

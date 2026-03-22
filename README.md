@@ -105,15 +105,16 @@ cd frontend
 
 
 Instalar dependências:
-
-
+```
 npm install
+```
 
 
 Rodar aplicação:
 
-
+```
 npm run dev
+```
 
 
 Aplicação rodará em:
@@ -121,6 +122,18 @@ Aplicação rodará em:
 
 http://localhost:5173
 
-Autor
+---
+# Sprint 2
 
+Para a sprint 2 foi implementado o banco de dados MySQL, com a tabela Users e Tasks, foi criado também seus respectivos CRUDS. Fazer maior parte das requisições requerem autenticação do JWT estando logado ou sendo owners das tasks para fazer requisições sobre elas.
+
+Novamente o frontEnd é apenas um prototipo pra teste das funções, nao é o foco dessa sprint
+
+---
+Para rodar o db, dentro de backend/database \
+abra o arquivo configdb.js e configure a conexão.
+
+Depois execute a query dentro de schema.sql
+
+---
 Projeto desenvolvido por Rafael Pastor Pereira para o desafio TaskFlow Fullstack.
