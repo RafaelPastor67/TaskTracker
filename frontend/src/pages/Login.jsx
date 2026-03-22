@@ -37,6 +37,7 @@ function Login() {
     const password = e.target.password.value
 
     await handleLogin(email, password)
+    console.log(email, password)
   }
 
   return (

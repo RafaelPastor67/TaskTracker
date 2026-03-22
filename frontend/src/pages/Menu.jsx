@@ -17,7 +17,7 @@ function Menu() {
       <button onClick={logout}>
         Logout
       </button>
-
+      
     </div>
   )
 }
