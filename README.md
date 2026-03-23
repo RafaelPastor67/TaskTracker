@@ -76,7 +76,7 @@ Foi incluído um arquivo:
 
 ## 1. Clonar o repositório
 
-git clone https://github.com/seu-usuario/taskflow.git
+git clone https://github.com/RafaelPastor67/TaskTracker
 
 
 ---
