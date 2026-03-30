@@ -23,3 +23,24 @@ export const verifyToken = (req, res, next) => {
     return res.status(403).json({ message: "Invalid token" })
   }
 }
+
+export const verifyAdmin = async (req,res,next) => {
+  const userId = req.user.id
+
+  const user = await buscarUsuarioPorId(userId)
+
+  if (!user) {
+    return res.status(404).json({ message: "Usuário não encontrado" })
+  }
+
+  if (user.role !== "admin") {
+    return res.status(403).json({ message: "Acesso negado" })
+  }
+
+  next()
+}
+
+//  localhost:3000/auth/admin
+// token: bearer $#32dsad!@#!@$@##
+
+// 200

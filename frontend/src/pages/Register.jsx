@@ -48,46 +48,49 @@ function Register() {
   }
 
   return (
-    <div>
+    
+    <div className="auth-main">
 
-      <h1>Register</h1>
+      
+      <form className="authform" onSubmit={handleRegister}>
+        <h1>Register</h1>
 
-      <form onSubmit={handleRegister}>
+        <div className="campos">
+          <input
+            placeholder="Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+          <input
+            placeholder="Email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
 
-        <input
-          placeholder="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
-
-        <input
-          placeholder="Email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-
-        <button type="submit" disabled={loading}>
+        <button className="submit-button" type="submit" disabled={loading}>
           {loading ? "Creating..." : "Register"}
         </button>
-
-      </form>
-
-      {error && <p>{error}</p>}
 
       <p>
         Já tem conta? <Link to="/">Login</Link>
       </p>
+      {error && <p>{error}</p>}
+      </form>
+
+      
+
+
 
     </div>
   )

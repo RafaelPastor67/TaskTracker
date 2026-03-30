@@ -1,5 +1,16 @@
 import db from "../database/configdb.js"
 
+function AdicionaUsuario(user){
+  db.query("INSERT INTO users (name,email,password) VALUES(?,?,?)",
+  [user.name,user.email,user.password],(err,resultado)=>{
+  if(err){
+    console.error("Nao foi possível adicionar usuário: ", err);
+    return;
+  }else{
+    console.log("Usuario adicionado ao banco: ",resultado.insertId)}
+  })
+}
+
 export const createUser = (user) => {
   AdicionaUsuario(user)
   return user
@@ -27,15 +38,4 @@ export function deleteUser(email){
     })
   })
 }
-
-// export const findUserByEmail = (email) => { Desse jeito nao vai funcionar pq o return vai ser so do callback, terrei q fazer async
-//   db.query("SELECT * FROM users WHERE email = ? ",[email],(err,resultado)=>{
-//     if(err){return}
-//   })
-   
-// }
-
-// export const findUserByEmail = (email) => {
-//   return users.find(u => u.email === email)
-// }
 

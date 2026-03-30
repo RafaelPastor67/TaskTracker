@@ -1,5 +1,11 @@
-import { useNavigate } from "react-router-dom"
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
+import Dropdown from 'react-bootstrap/Dropdown';
+import { FaList } from "react-icons/fa6";
+import { MdOutlineLogout } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
+import { Sidebar } from "../assets/sidebar";
+import { Footer } from "../assets/Footer";
+import { Topbar } from "../assets/Topbar";
 
 function Menu() {
   const navigate = useNavigate()
@@ -8,7 +14,7 @@ function Menu() {
   const [user, setUser] = useState("")
   const [loading, setLoading] = useState(true)
   const [newTask, setNewTask] = useState("")
-
+  
   const getToken = () => localStorage.getItem("token")
 
   const decodeUser = (token) => {
@@ -121,70 +127,70 @@ function Menu() {
 
   if (loading) return <p>Carregando...</p>
 
+
+
   return (
-    <div style={{ padding: "20px" }}>
-      <div style={{ marginBottom: "20px" }}>
-        <h1>Você está logado como {user}</h1>
-        <button onClick={logout}>Logout</button>
-      </div>
+    
+<div>
+  <div className="layout">
 
-      <div>
-        <h2>Tasks:</h2>
+    <Sidebar/>
 
-        <form onSubmit={createTask} style={{ marginBottom: "15px" }}>
-          <input
-            type="text"
-            value={newTask}
-            onChange={(e) => setNewTask(e.target.value)}
-            placeholder="Nova task..."
-          />
-          <button type="submit">Adicionar</button>
-        </form>
+      <div className="mainframe">
 
-        {tasks.length === 0 ? (
-          <p>Nenhuma task</p>
-        ) : (
-          tasks.map(task => (
-            <div
-              key={task.id}
-              style={{
-                display: "flex",
-                gap: "10px",
-                alignItems: "center",
-                marginBottom: "8px"
-              }}
-            >
-              <input
-                type="checkbox"
-                checked={!!task.completed}
-                onChange={() => toggleTask(task.id, task.completed)}
+        <Topbar user= {user} logout = {logout}/>
+        <main>
+        
+            <form className="input-tasks-flex" onSubmit={createTask} style={{ marginBottom: "15px" }}>
+              <input className="input-task"
+                type="text"
+                value={newTask}
+                onChange={(e) => setNewTask(e.target.value)}
+                placeholder="Nova task..."
               />
-
-              <span
-                style={{
-                  textDecoration: task.completed ? "line-through" : "none"
-                }}
-              >
-                {task.title}
-              </span>
-
-              <button
-                onClick={() => deleteTask(task.id)}
-                style={{
-                  background: "red",
-                  color: "white",
-                  border: "none",
-                  padding: "4px 8px",
-                  cursor: "pointer"
-                }}
-              >
-                X
-              </button>
+              <button type="submit">Adicionar</button>
+            </form>
+           <div className="card">
+            <div className="card-header">
+              <FaList />
+            <span>  ACTIVE TASK </span>
+             <span className="badge rounded-pill text-bg-primary">{tasks.length}</span>
             </div>
-          ))
-        )}
+            <div className="card-body">
+            {tasks.length === 0 ? (
+
+            <p className="task">Nenhuma task criada ainda</p>
+        
+          ) : (
+            tasks.map(task => (
+              <div className="task" key={task.id}>
+                <input className="task-check" type="checkbox" checked={!!task.completed}
+                  onChange={() => toggleTask(task.id, task.completed)}/>
+                <span
+                  style={{
+                    textAlign:"center",
+                    textDecoration: task.completed ? "line-through" : "none"
+                  }}
+                >
+                  {task.title}
+                </span>
+                <button className="btn btn-danger"
+                  onClick={() => deleteTask(task.id)}
+                >
+                  X
+                </button>
+              </div>
+            ))
+          )}
+        
+            </div>
+            </div>
+        </main>
       </div>
-    </div>
+      </div>
+
+      <Footer/>
+</div>
   )
 }
 

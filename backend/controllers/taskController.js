@@ -20,7 +20,12 @@ export const createTaskController = async (req, res) => {
     
     const result = await createTask({ title, user_id })
 
-    res.status(201).json({ message: "Task criada", id: result.insertId })
+    res.status(201).json({
+      id: result.insertId,
+      title,
+      completed: false,
+      user_id
+    })
   } catch (err) {
     console.error("ERRO: ", err)
     res.status(500).json({ error: "Erro ao criar task" })
