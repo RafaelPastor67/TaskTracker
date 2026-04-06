@@ -1,29 +1,45 @@
 import { FaTasks, FaUser } from "react-icons/fa";
 import { TfiBarChart } from "react-icons/tfi";
 import { NavLink } from "react-router-dom"
+import { getToken } from "../services/utils/auth";
 
-export function Sidebar(){
-    return(
+
+export function Sidebar() {
+    const token = getToken()
+    let role = null;
+
+    if (token) {
+        try {
+            role = JSON.parse(atob(token.split(".")[1])).role
+        } catch {
+            role = null
+        }
+    }
+    return (
+
         <div className="Sidebar-root">
             <header className="acrylic sideHeader">
-                <img width='40px'src="./src/assets/logo.svg" alt="Logo" />
+                <img width='40px' src="./src/assets/logo.svg" alt="Logo" />
                 <h3>TASKFLOW</h3>
             </header>
             <div className="Sidebar">
                 <NavLink
-                to={"/menu"}
-                className= {({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>
-                    <i className="icon"><FaTasks/></i><p>Tasks</p>
+                    to={"/menu"}
+                    className={({ isActive }) => isActive ? "sidebar-link active" : "sidebar-link"}>
+                    <i className="icon"><FaTasks /></i><p>Tasks</p>
                 </NavLink>
+
                 <NavLink
-                to={"/dashboard"}
-                className= {({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}><i className="icon"><TfiBarChart/></i>Dashboard</NavLink>
-                
-                (<NavLink
-                to={"/admin"}
-                className= {({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}><i className="icon"><FaUser/></i>Admin</NavLink>
-                )
+                    to={"/dashboard"}
+                    className={({ isActive }) => isActive ? "sidebar-link active" : "sidebar-link"}><i className="icon"><TfiBarChart /></i>Dashboard</NavLink>
+
+                {role == "admin" && (<NavLink
+                    to={"/admin"}
+                    className={({ isActive }) => isActive ? "sidebar-link active" : "sidebar-link"}><i className="icon"><FaUser /></i>Admin</NavLink>
+                )}
             </div>
         </div>
+
     )
+
 }

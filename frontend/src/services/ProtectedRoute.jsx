@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { Navigate } from "react-router-dom"
 
-function PrivateRoute({ children }) {
+function PrivateRoute({ children, requireAdmin = false }) {
 
   const [status, setStatus] = useState("loading")
 
@@ -19,19 +19,34 @@ function PrivateRoute({ children }) {
         Authorization: `Bearer ${token}`
       }
     })
-    .then(res => {
-      if (res.ok) setStatus("authorized")
-      else setStatus("unauthorized")
+    .then(async res => {
+      if (!res.ok) {
+        setStatus("unauthorized")
+        return
+      }
+
+      const data = await res.json()
+
+      if (requireAdmin && data.user.role !== "admin") {
+        setStatus("forbidden")
+        return
+      }
+
+      setStatus("authorized")
     })
     .catch(() => setStatus("unauthorized"))
 
-  }, [])
+  }, [requireAdmin])
 
   if (status === "loading") return <p>Loading...</p>
 
   if (status === "unauthorized") {
     return <Navigate to="/" replace />
   }
+
+  if (status === "forbidden") {
+  return <Navigate to="/menu" replace />
+}
 
   return children
 }

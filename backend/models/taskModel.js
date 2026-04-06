@@ -39,11 +39,11 @@ export function deleteTask(task_id, user_id) {
   })
 }
 
-export const updateTaskStatus = (id, completed) => {
+export const updateTaskStatus = (id, user_id, completed) => {
   return new Promise((resolve, reject) => {
     db.query(
-      "UPDATE tasks SET completed = ? WHERE id = ?",
-      [completed, id],
+      "UPDATE tasks SET completed = ? WHERE id = ? AND user_id = ?",
+      [completed, id, user_id],
       (err, result) => {
         if (err) return reject(err)
         resolve(result)

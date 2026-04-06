@@ -17,6 +17,6 @@ app.get("/", (req,res) => {
   res.send("API Funcionando")
 });
 
-app.listen(5000, () => {
+app.listen(5000,'0.0.0.0', () => {
   console.log("Servidor rodando na porta 5000")
 })

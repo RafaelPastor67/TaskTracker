@@ -1,56 +1,63 @@
-import bcrypt from "bcrypt" // lib que vai encrpitar a senhas e fazer suas validações
-import jwt from "jsonwebtoken" // cria os tokens de autenticação e valida
+import bcrypt from "bcrypt" // lib que vai encrpitar a senhas e fazer suas validaÃ§Ãµes
+import jwt from "jsonwebtoken" // cria os tokens de autenticaÃ§Ã£o e valida
 import { createUser, findUserByEmail } from "../models/userModel.js"
-import dotenv from "dotenv" // carrrega a palavra secreta do JWT 
-dotenv.config({ path: ".env.example" })// carrrega a palavra secreta do JWT -
+import dotenv from "dotenv" // carrrega a palavra secreta do JWT
 
-const secret = (process.env.JWT_SECRET) // armazena a chave
+dotenv.config({ path: ".env" })// carrrega a palavra secreta do JWT -
 
-export const register = async (req, res) => {
+const secret = process.env.JWT_SECRET // armazena a chave
 
-  const { name, email, password } = req.body
-  const userExists = await findUserByEmail(email)
-  if (userExists) return res.status(400).json({ message: "Email already used" })
+export function createAuthController({ //Fabrica pros testes
+  createUserFn = createUser,
+  findUserByEmailFn = findUserByEmail,
+  bcryptLib = bcrypt,
+  jwtLib = jwt,
+  jwtSecret = secret,
+} = {}) 
+{
+  const register = async (req, res) => {
+    const { name, email, password } = req.body
+    const userExists = await findUserByEmailFn(email)
+    if (userExists) return res.status(400).json({ message: "Email already used" })
 
-  const hashedPassword = await bcrypt.hash(password, 10)
-  
-  const user = createUser({
-    name,
-    email,
-    password: hashedPassword
-  })
+    const hashedPassword = await bcryptLib.hash(password, 10)
 
-  res.json(user)
-}
+    const user = await createUserFn({
+      name,
+      email,
+      password: hashedPassword,
+    })
 
-export const login = async (req, res) => {
-
-  const { email, password } = req.body
-  const user = await findUserByEmail(email)
-  if (!user){
-    return res.status(400).json({ message: "Invalid credentials" })
+    res.json(user)
   }
-     
 
-  const valid = await bcrypt.compare(password, user.password)
-  if (!valid){
-    return res.status(400).json({ message: "Invalid credentials" })
-  } 
+  const login = async (req, res) => {
+    const { email, password } = req.body
+    const user = await findUserByEmailFn(email)
+    if (!user) {
+      return res.status(400).json({ message: "Invalid credentials" })
+    }
 
-  const token = jwt.sign( // Cria o token com a assinatura que ta sendo puxada do .env de exemplo
-    { 
-      id: user.id,
-      name:user.name,
-      email: user.email,
-      role: user.role
-    },
-    secret,
-    { expiresIn: "1h" }
-  )
+    const valid = await bcryptLib.compare(password, user.password)
+    if (!valid) {
+      return res.status(400).json({ message: "Invalid credentials" })
+    }
 
-  res.json({ token })
+    const token = jwtLib.sign(
+      {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+      jwtSecret,
+      { expiresIn: "1h" }
+    )
+
+    res.json({ token })
+  }
+
+  return { register, login }
 }
-////////////////////////////////
 
-
-
+export const { register, login } = createAuthController()

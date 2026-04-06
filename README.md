@@ -1,139 +1,119 @@
-# TaskFlow — Sprint 1
+# TaskFlow
 
-Este repositório contém a **Sprint 1** do projeto **TaskFlow**, um sistema de gestão de tarefas desenvolvido como parte de um desafio **Fullstack**.
+Aplicação full stack para gerenciamento de tarefas, com autenticação JWT, controle de acesso por perfil e integração entre frontend em React e backend em Node.js/Express.
 
-O objetivo desta sprint foi estabelecer **a base da aplicação**, com foco principal no **backend e no sistema de autenticação**, deixando o frontend propositalmente simples para priorizar a arquitetura da API.
+## Funcionalidades
 
----
+- Cadastro e login de usuários
+- Autenticação com JWT
+- Proteção de rotas no backend e no frontend
+- CRUD de tarefas por usuário autenticado
+- Gerenciamento de usuários por administradores
+- Atualização e exclusão da própria conta
 
-# Objetivos da Sprint 1
+## Tecnologias utilizadas
 
-Nesta primeira sprint foram implementados os seguintes elementos fundamentais:
+### Backend
 
-- Estrutura inicial do projeto
-- API backend com **Node.js e Express**
-- Sistema de **registro e login de usuários**
-- **Hash de senha com bcrypt**
-- Autenticação utilizando **JSON Web Token (JWT)**
-- **Middleware de proteção de rotas**
-- Endpoint para verificação de usuário autenticado
-- Integração básica com o frontend
-
-O frontend foi desenvolvido de forma **minimalista**, apenas para validar o fluxo de autenticação e a comunicação com a API.
-
----
-
-# Tecnologias Utilizadas
-
-## Backend
 - Node.js
 - Express
+- MySQL
 - bcrypt
 - JSON Web Token (JWT)
 - dotenv
+- cors
 
-## Frontend
+### Frontend
+
 - React
-- React Router
-- Fetch API
+- Vite
+- React Router DOM
+- Bootstrap
+- React Bootstrap
+- React Icons
 
-## Ferramentas
-- Git / GitHub
-- Nodemon
+## Estrutura do projeto
 
----
+```bash
+TaskTracker/
+├── backend/
+│   ├── controllers/
+│   ├── database/
+│   ├── middleware/
+│   ├── models/
+│   ├── routes/
+│   └── tests/
+└── frontend/
+    ├── src/
+    └── package.json
 
-# Frontend
+```
+## Requisitos
 
-O frontend desta sprint foi desenvolvido apenas para **testar e demonstrar o fluxo de autenticação**.
+- Node.js e npm
+- MySQL em execução
 
-Ele contém três páginas simples:
+## Variáveis de ambiente
+O backend utiliza um arquivo .env dentro da pasta backend. Use backend/.env.example como base:
+```
+JWT_SECRET=INSIRA_CHAVE_DO_JWT
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=INSIRA_SENHA_DO_BANCO
+DB_NAME=taskflow
+```
 
-- **Login**
-- **Register**
-- **Menu (acessível apenas com autenticação)**
+## Como executar o projeto
 
-A interface foi mantida propositalmente simples para que o desenvolvimento pudesse **priorizar a lógica e segurança do backend**.
+1. Clonar o repositório
+```
+git clone https://github.com/RafaelPastor67/TaskTracker.git
+cd TaskTracker
+```
+2. Configurar o banco de dados
+Execute o script backend/database/schema.sql no MySQL para criar o banco taskflow e as tabelas users e tasks.
 
----
-
-# Sistema de Autenticação
-
-O sistema de autenticação utiliza **JWT (JSON Web Token)**.
-
-
----
-
-# Variáveis de Ambiente
-
-O projeto utiliza variáveis de ambiente para configurações sensíveis.
-
-Foi incluído um arquivo:
-
-.env.example
-
-# Como Executar o Projeto
-
-## 1. Clonar o repositório
-
-git clone https://github.com/RafaelPastor67/TaskTracker
-
-
----
-
-## 2. Executar o Backend
-
-Entrar na pasta:
-
+3. Executar o backend
+```
 cd backend
-
 npm install
-
-npm install
-
-Servidor rodará em:
-
-
-http://localhost:5000
-
----
-## 3. Executar o Frontend
-
-Entrar na pasta:
-
-cd frontend
-
-
-Instalar dependências:
-```
-npm install
-```
-
-
-Rodar aplicação:
-
-```
 npm run dev
 ```
+O backend será iniciado em http://localhost:5000.
 
+4. Executar o frontend
+Em outro terminal:
+```
+cd frontend
+npm install
+npm run dev
 
-Aplicação rodará em:
+```
+O frontend será iniciado em http://localhost:5173
 
+## Rotas principais da API
 
-http://localhost:5173
+**Autenticação**
+- `POST /auth/register` - cria uma nova conta
 
----
-# Sprint 2
+- `POST /auth/login` - autentica o usuário e retorna um token JWT
+- `GET /auth/me` - retorna os dados do usuário autenticado
+- `GET /auth/admin` - valida acesso administrativo
 
-Para a sprint 2 foi implementado o banco de dados MySQL, com a tabela Users e Tasks, foi criado também seus respectivos CRUDS. Fazer maior parte das requisições requerem autenticação do JWT estando logado ou sendo owners das tasks para fazer requisições sobre elas.
+**Usuários**
+- `GET /auth/users` - lista usuários (admin)
+- `POST /auth/users` - cria um usuário (admin)
+- `PUT /auth/users/:id` - atualiza um usuário
+- `DELETE /auth/users/:id` - remove um usuário ou a própria conta
 
-Novamente o frontEnd é apenas um prototipo pra teste das funções, nao é o foco dessa sprint
+**Tarefas**
 
----
-Para rodar o db, dentro de backend/database \
-abra o arquivo configdb.js e configure a conexão.
+- `GET /tasks` - lista as tarefas do usuário autenticado
+- `POST /tasks` - cria uma nova tarefa
+- `PUT /tasks/:id` - atualiza o status de uma tarefa
+- `DELETE /tasks/:id` - remove uma tarefa
 
-Depois execute a query dentro de schema.sql
+## Interface
 
----
-Projeto desenvolvido por Rafael Pastor Pereira para o desafio TaskFlow Fullstack.
+O frontend possui fluxo de login, cadastro, listagem de tarefas e uma área administrativa para gerenciamento de usuários. A interface é construída em React com Vite e utiliza Bootstrap para estilização.

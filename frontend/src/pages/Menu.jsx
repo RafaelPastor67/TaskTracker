@@ -6,30 +6,31 @@ import { useNavigate } from "react-router-dom";
 import { Sidebar } from "../assets/sidebar";
 import { Footer } from "../assets/Footer";
 import { Topbar } from "../assets/Topbar";
+import { RiDeleteBin7Fill } from "react-icons/ri";
+import { getToken, decodeUser } from "../services/utils/auth";
+
 
 function Menu() {
+  
   const navigate = useNavigate()
-
   const [tasks, setTasks] = useState([])
   const [user, setUser] = useState("")
   const [loading, setLoading] = useState(true)
   const [newTask, setNewTask] = useState("")
-  
-  const getToken = () => localStorage.getItem("token")
+  const [isActiveTaskOpen, setisActiveTaskOpen] = useState(true)
+  const [isConcludedTaskOpen, setisConcludedTaskOpen] = useState(true)
+  const activeTasks = tasks.filter(task => !task.completed)
+  const completedTasks = tasks.filter(task => task.completed)
 
-  const decodeUser = (token) => {
-    try {
-      const payload = JSON.parse(atob(token.split(".")[1]))
-      return payload.name
-    } catch {
-      return null
-    }
-  }
 
-  const logout = () => {
+
+
+const logout = () => {
     localStorage.removeItem("token")
     navigate("/")
-  }
+}
+
+
 
   const fetchTasks = async () => {
     const token = getToken()
@@ -130,17 +131,17 @@ function Menu() {
 
 
   return (
-    
-<div>
-  <div className="layout">
 
-    <Sidebar/>
+    <div>
+      <div className="layout">
 
-      <div className="mainframe">
+        <Sidebar />
 
-        <Topbar user= {user} logout = {logout}/>
-        <main>
-        
+        <div className="mainframe">
+
+          <Topbar />
+          <main>
+
             <form className="input-tasks-flex" onSubmit={createTask} style={{ marginBottom: "15px" }}>
               <input className="input-task"
                 type="text"
@@ -150,47 +151,75 @@ function Menu() {
               />
               <button type="submit">Adicionar</button>
             </form>
-           <div className="card">
-            <div className="card-header">
-              <FaList />
-            <span>  ACTIVE TASK </span>
-             <span className="badge rounded-pill text-bg-primary">{tasks.length}</span>
-            </div>
-            <div className="card-body">
-            {tasks.length === 0 ? (
-
-            <p className="task">Nenhuma task criada ainda</p>
-        
-          ) : (
-            tasks.map(task => (
-              <div className="task" key={task.id}>
-                <input className="task-check" type="checkbox" checked={!!task.completed}
-                  onChange={() => toggleTask(task.id, task.completed)}/>
-                <span
-                  style={{
-                    textAlign:"center",
-                    textDecoration: task.completed ? "line-through" : "none"
-                  }}
-                >
-                  {task.title}
-                </span>
-                <button className="btn btn-danger"
-                  onClick={() => deleteTask(task.id)}
-                >
-                  X
-                </button>
+            <div className="card">
+              <div className="card-header" onClick={() => { setisActiveTaskOpen(prev => !prev) }}>
+                <FaList />
+                <span>  ACTIVE TASK </span>
+                <span className="badge rounded-pill text-bg-primary">{activeTasks.length}</span>
               </div>
-            ))
-          )}
-        
+              {isActiveTaskOpen &&(<div className="card-body">
+                {activeTasks.length === 0 ? (
+
+                  <p className="task">Nenhuma task criada ainda</p>
+
+                ) : (
+                  activeTasks.map(task => (
+                    <div className="task" key={task.id}>
+                      <input className="task-check" type="checkbox" checked={!!task.completed}
+                        onChange={() => toggleTask(task.id, task.completed)} />
+                      <p
+                        style={{
+                          textAlign: "center",
+                          textDecoration: task.completed ? "line-through" : "none"
+                        }}
+                      >
+                        {task.title}
+                      </p>
+                      <button className="btn btn-danger"
+                        onClick={() => deleteTask(task.id)}
+                      >
+                        X
+                      </button>
+                    </div>
+                  ))
+                )}
+
+              </div>)}
             </div>
-            </div>
-        </main>
-      </div>
+
+            {completedTasks.length>0 &&(<div className="card task-concluidas">
+              <div className="card-header" onClick={()=>{setisConcludedTaskOpen(prev=>!prev)}}><FaList /><span>CONCLUIDAS</span>
+              <span className="badge rounded-pill text-bg-primary">{completedTasks.length}</span></div>
+              
+              {isConcludedTaskOpen&&(<div className="card-body">
+                {(completedTasks.map(task => (
+                    <div className="task" key={task.id}>
+                      <input className="task-check" type="checkbox" checked={!!task.completed}
+                        onChange={() => toggleTask(task.id, task.completed)} />
+                      <p
+                        style={{
+                          textAlign: "center",
+                          textDecoration: task.completed ? "line-through" : "none"
+                        }}
+                      >
+                        {task.title}
+                      </p>
+                      <button className="btn btn-danger"
+                        onClick={() => deleteTask(task.id)}
+                      >
+                        <RiDeleteBin7Fill />
+                      </button>
+                    </div>
+                  )))}
+              </div>)}
+            </div>)}
+
+          </main>
+        </div>
       </div>
 
-      <Footer/>
-</div>
+      <Footer />
+    </div>
   )
 }
 
