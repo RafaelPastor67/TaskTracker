@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react"
 import { Navigate } from "react-router-dom"
+import { API_URL } from "./api"
 
 function PrivateRoute({ children, requireAdmin = false }) {
-
   const [status, setStatus] = useState("loading")
 
   useEffect(() => {
-
     const token = localStorage.getItem("token")
 
     if (!token) {
@@ -14,28 +13,27 @@ function PrivateRoute({ children, requireAdmin = false }) {
       return
     }
 
-    fetch("http://localhost:5000/auth/me", {
+    fetch(`${API_URL}/auth/me`, {
       headers: {
-        Authorization: `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     })
-    .then(async res => {
-      if (!res.ok) {
-        setStatus("unauthorized")
-        return
-      }
+      .then(async (res) => {
+        if (!res.ok) {
+          setStatus("unauthorized")
+          return
+        }
 
-      const data = await res.json()
+        const data = await res.json()
 
-      if (requireAdmin && data.user.role !== "admin") {
-        setStatus("forbidden")
-        return
-      }
+        if (requireAdmin && data.user.role !== "admin") {
+          setStatus("forbidden")
+          return
+        }
 
-      setStatus("authorized")
-    })
-    .catch(() => setStatus("unauthorized"))
-
+        setStatus("authorized")
+      })
+      .catch(() => setStatus("unauthorized"))
   }, [requireAdmin])
 
   if (status === "loading") return <p>Loading...</p>
@@ -45,8 +43,8 @@ function PrivateRoute({ children, requireAdmin = false }) {
   }
 
   if (status === "forbidden") {
-  return <Navigate to="/menu" replace />
-}
+    return <Navigate to="/projects" replace />
+  }
 
   return children
 }

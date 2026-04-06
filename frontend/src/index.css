@@ -40,6 +40,11 @@ body{
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
 }
+
+img{
+  max-width: 100%;
+  height: auto;
+}
 a {
   margin-top: 1rem;
   font-weight: 500;
@@ -78,6 +83,12 @@ input{
   margin-top: 1em;
   display: flex;
 }
+
+input,
+select,
+textarea{
+  max-width: 100%;
+}
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
@@ -94,7 +105,8 @@ input{
   margin-bottom: 2rem;
 }
 .auth-main{
-  height: 100vh;
+  min-height: 100vh;
+  padding: 1.5rem;
   display: flex;
   align-items: center;
   justify-content: center ;
@@ -117,7 +129,8 @@ opacity: 80%;
 
   border-radius: 20px;
   border: 2px solid rgb(77, 77, 77);
-  padding: 50px;
+  width: min(100%, 29rem);
+  padding: clamp(1.75rem, 4vw, 3.125rem);
   display: flex;
   flex-direction: column;
   text-align: center;
@@ -128,7 +141,7 @@ input{
   border: 0px;
   border-radius: 15px;
   height: 40px;
-  width: 350px;
+  width: min(100%, 350px);
 }
 p{
   margin: 0;
@@ -139,7 +152,7 @@ p{
 }
 header{
   align-items: center;
-  padding: 20px 50px;
+  padding: 20px clamp(1rem, 4vw, 3.125rem);
   display: flex;
   justify-content: end;
   background-color: #6b95c2;
@@ -172,11 +185,20 @@ header{
   flex-direction: row;
 }
 
+.inputDropdow p{
+  margin: 0;
+  max-width: 14rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .card{
   background: rgba(5, 38, 89, 0.08); 
   backdrop-filter: blur(100px);
   color: white;
   margin: 0 12%;
+  margin-top: 10px;
   margin-bottom: 30px;
 }
 .card-header{
@@ -187,14 +209,17 @@ header{
 }
 .input-tasks-flex{
   display: flex;
+  gap: 1rem;
+  align-items: stretch;
   margin: 0 12%;
   
 }
 .input-task{
   box-shadow: 0 0 6px rgba(255, 255, 255, 0.3);
   margin-top: 0;
-  margin-right: 20px;
+  margin-right: 0;
   width: 100%;
+  min-width: 0;
 }
 .task{
   display: flex;
@@ -207,9 +232,12 @@ header{
   
 }
 .task p{
+  min-width: 0;
   overflow-wrap: anywhere;
   word-break: break-word;
   white-space: normal;
+  flex: 1;
+  text-align: left;
 }
 
 .card-body{
@@ -232,14 +260,17 @@ header{
   display: flex;
   width: 100%;
   min-height: 100vh;
+  padding-bottom: 64px;
 }
 .Sidebar-root{
   width: 400px;
+  min-width: 0;
   flex-shrink: 0;
   border-right: 1px solid rgba(255, 255, 255, 0.1);
   background-color: rgba(0, 0, 0, 0.1);
   box-shadow: 12px 0 30px rgba(0, 0, 0, 0.28);
   z-index: 1;
+  padding-bottom: 64px;
 }
 .Sidebar{
   height: 300px;
@@ -255,6 +286,7 @@ header{
 .mainframe{
   padding-bottom: 150px;
   flex: 1;
+  min-width: 0;
 }
 .sideHeader{
   justify-content: center;
@@ -263,19 +295,22 @@ header{
 }
 .footer{
   height: 50px;
-  width: 100vw;
+  width: 100%;
   display: flex;
   align-items: center;
+  justify-content: center;
   position: fixed;
   z-index: 100;
   bottom: 0;
   padding: 2rem;
+  text-align: center;
   border-top: 1px solid rgba(193, 232, 255, 0.15);
 }
 .main-header{
   height: 84px;
 }
 .Sidebar a{
+  margin-top: 0;
   justify-content: center;
   gap: 10px;
   align-items: center;
@@ -302,4 +337,414 @@ color: #d4d4d4;
 
 table.myTable{
   background-color: #202f44;
+  min-width: 640px;
+}
+
+.Sidebar-root{
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.Sidebar{
+  height: auto;
+  padding-bottom: 1rem;
+}
+
+.sidebar-projects{
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.25rem;
+  padding-bottom: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  min-height: 0;
+}
+
+.sidebar-section-title{
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.sidebar-project-list{
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.project-link{
+  display: block;
+  margin-top: 0;
+  padding: 0.85rem 1rem;
+  border-radius: 14px;
+  color: #d7e6f7;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid transparent;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.project-link:hover{
+  color: white;
+  border-color: rgba(193, 232, 255, 0.16);
+}
+
+.project-link.active{
+  color: white;
+  background: rgba(75, 125, 190, 0.28);
+  border-color: rgba(193, 232, 255, 0.2);
+}
+
+.sidebar-muted,
+.sidebar-error{
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.sidebar-error{
+  color: #ffd6d6;
+}
+
+.sidebar-project-form{
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-top: 0;
+  padding: 0.85rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sidebar-project-form input{
+  width: 100%;
+  margin-top: 0;
+  background: rgba(255, 255, 255, 0.94);
+  color: #021024;
+  box-shadow: none;
+}
+
+.sidebar-project-form button{
+  margin-top: 0;
+  width: 100%;
+  min-height: 44px;
+  padding: 0.65rem 1rem;
+  background: #4b7dbe;
+  color: white;
+  border: none;
+  box-shadow: 0 0 12px rgba(75, 125, 190, 0.35);
+}
+
+.project-panel{
+  padding-bottom: 2rem;
+}
+
+.project-panel-header{
+  margin: 0 12% 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 1.5rem;
+  color: white;
+}
+
+.project-label{
+  margin-bottom: 0.45rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.project-panel-header h2{
+  margin: 0;
+  font-size: 2rem;
+}
+
+.project-meta{
+  margin-top: 0.45rem;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.project-delete-button{
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(143, 40, 40, 0.75);
+  color: white;
+  border: 1px solid rgba(255, 166, 166, 0.16);
+}
+
+.project-delete-button:hover{
+  background: rgba(171, 51, 51, 0.88);
+  border-color: rgba(255, 166, 166, 0.3);
+}
+
+.empty-project-state{
+  margin: 0 12%;
+  margin-bottom: 5rem;
+  padding: 3rem 2rem;
+  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+  color: white;
+}
+
+.project-creator-form{
+  width: min(520px, 100%);
+  display: flex;
+  gap: 0.9rem;
+  align-items: center;
+}
+
+.project-creator-form input{
+  width: 100%;
+  margin-top: 0;
+  background: rgba(255, 255, 255, 0.94);
+  color: #021024;
+}
+
+.project-creator-form button{
+  background: #4b7dbe;
+  color: white;
+  white-space: nowrap;
+}
+
+.project-helper{
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.project-helper.error{
+  color: #ffd6d6;
+}
+
+.empty-project-icon{
+  font-size: 2.2rem;
+  color: #8eb2de;
+}
+
+.main-error{
+  margin: 0 12% 1rem;
+  color: #ffd6d6;
+}
+
+.input-tasks-flex button{
+  background: #4b7dbe;
+  color: white;
+  box-shadow: 0 0 10px rgba(75, 125, 190, 0.3);
+}
+
+.admin-main{
+  padding: 0 clamp(1rem, 4vw, 3.125rem) 5rem;
+}
+
+.admin-toolbar{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.admin-subtitle{
+  opacity: 0.8;
+}
+
+.admin-card{
+  margin: 0 0 1.5rem;
+}
+
+.admin-card-body{
+  padding: 1.5rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.admin-form{
+  display: grid;
+  gap: 0.75rem;
+  background: rgba(255,255,255,0.04);
+  padding: 1.25rem;
+  border-radius: 14px;
+}
+
+.admin-select{
+  height: 40px;
+  border-radius: 15px;
+  padding: 0 1rem;
+  border: 0;
+}
+
+.admin-form-actions,
+.admin-actions{
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.admin-table-wrapper{
+  overflow-x: auto;
+}
+
+@media (max-width: 960px) {
+  .layout{
+    flex-direction: column;
+  }
+
+  .Sidebar-root{
+    width: 100%;
+    min-height: auto;
+    padding-bottom: 0;
+  }
+
+  .Sidebar{
+    padding: 0 1rem 1rem;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  .sidebar-link{
+    flex: 1 1 11rem;
+    min-height: 3.5rem;
+    height: auto;
+    padding: 0.9rem 1rem;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .sidebar-link.active{
+    border: 1px solid rgba(193, 232, 255, 0.22);
+    background: rgba(75, 125, 190, 0.18);
+  }
+
+  .project-panel-header,
+  .input-tasks-flex,
+  .card,
+  .empty-project-state,
+  .main-error{
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
+
+  .project-panel-header{
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .input-tasks-flex{
+    flex-direction: column;
+  }
+
+  .input-tasks-flex button{
+    width: 100%;
+  }
+
+  .footer{
+    position: static;
+    width: 100%;
+    min-height: 50px;
+    height: auto;
+    padding: 1.25rem 1rem;
+  }
+
+  .layout{
+    padding-bottom: 0;
+  }
+
+  .project-creator-form{
+    flex-direction: column;
+  }
+
+  .project-creator-form button{
+    width: 100%;
+  }
+
+  .admin-main{
+    padding: 0 1rem 4rem;
+  }
+
+  .admin-card-body{
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  h1{
+    font-size: clamp(2rem, 8vw, 2.6rem);
+  }
+
+  .auth-main{
+    padding: 1rem;
+  }
+
+  .authform{
+    border-radius: 18px;
+    padding: 1.5rem 1.25rem;
+  }
+
+  .main-header,
+  .sideHeader{
+    min-height: auto;
+    padding: 1rem;
+  }
+
+  .main-header{
+    justify-content: center;
+  }
+
+  .inputDropdow{
+    width: 100%;
+    justify-content: center;
+  }
+
+  .sidebar-projects{
+    padding: 1rem;
+    padding-top: 0;
+  }
+
+  .project-panel-header h2{
+    font-size: 1.6rem;
+  }
+
+  .task{
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+
+  .task p{
+    font-size: 0.95rem;
+    text-align: left;
+  }
+
+  .task-check{
+    width: 24px;
+    min-width: 24px;
+  }
+
+  .project-delete-button,
+  .admin-toolbar > button,
+  .admin-form-actions > button{
+    width: 100%;
+    justify-content: center;
+  }
 }

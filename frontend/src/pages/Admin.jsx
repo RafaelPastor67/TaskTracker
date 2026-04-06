@@ -176,20 +176,11 @@ export function Admin() {
         <div className="mainframe">
           <Topbar />
 
-          <main style={{ padding: "0 50px 80px" }}>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                gap: "20px",
-                marginBottom: "24px",
-                flexWrap: "wrap",
-              }}
-            >
+          <main className="admin-main">
+            <div className="admin-toolbar">
               <div>
                 <h1 style={{ margin: 0 }}>Menu Administrador</h1>
-                <p style={{ opacity: 0.8 }}>
+                <p className="admin-subtitle">
                   Gerencie usuários, cargos e acessos do sistema.
                 </p>
               </div>
@@ -203,11 +194,8 @@ export function Admin() {
               </button>
             </div>
 
-            <div className="card" style={{ margin: 0, marginBottom: "24px" }}>
-              <div
-                className="card-body"
-                style={{ padding: "24px", display: "grid", gap: "16px" }}
-              >
+            <div className="card admin-card">
+              <div className="card-body admin-card-body">
                 <input
                   type="text"
                   value={search}
@@ -223,16 +211,7 @@ export function Admin() {
                 )}
 
                 {isFormOpen && (
-                  <form
-                    onSubmit={handleSubmit}
-                    style={{
-                      display: "grid",
-                      gap: "12px",
-                      background: "rgba(255,255,255,0.04)",
-                      padding: "20px",
-                      borderRadius: "14px",
-                    }}
-                  >
+                  <form className="admin-form" onSubmit={handleSubmit}>
                     <h3 style={{ margin: 0 }}>
                       {editingUserId ? "Editar usuário" : "Criar usuário"}
                     </h3>
@@ -275,18 +254,13 @@ export function Admin() {
                       name="role"
                       value={formData.role}
                       onChange={handleChange}
-                      style={{
-                        height: "40px",
-                        borderRadius: "15px",
-                        padding: "0 1rem",
-                        border: 0,
-                      }}
+                      className="admin-select"
                     >
                       <option value="user">user</option>
                       <option value="admin">admin</option>
                     </select>
 
-                    <div style={{ display: "flex", gap: "12px" }}>
+                    <div className="admin-form-actions">
                       <button type="submit" className="btn btn-success">
                         {editingUserId ? "Salvar alterações" : "Criar usuário"}
                       </button>
@@ -301,8 +275,8 @@ export function Admin() {
                   </form>
                 )}
 
-                <div style={{ overflowX: "auto" }}>
-                  <table className="table table-hover align-middle myTable">
+                <div className="admin-table-wrapper">
+                  <table className="table table-hover table-dark align-middle myTable">
                     <thead>
                       <tr>
                         <th>ID</th>
@@ -341,7 +315,7 @@ export function Admin() {
                                 : "-"}
                             </td>
                             <td>
-                              <div style={{ display: "flex", gap: "8px" }}>
+                              <div className="admin-actions">
                                 <button
                                   type="button"
                                   className="btn btn-warning btn-sm"

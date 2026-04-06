@@ -1,6 +1,9 @@
 import { deleteUser, updateUserById, getAllUsers, findUserById, createUser, findUserByEmail } from "../models/userModel.js"
 import bcrypt from "bcrypt"
 
+const normalizeText = (value) => (typeof value === "string" ? value.trim() : "")
+const hasText = (value) => normalizeText(value).length > 0
+
 export function createUserController({
   deleteUserFn = deleteUser,
   updateUserByIdFn = updateUserById,
@@ -52,17 +55,38 @@ export function createUserController({
       return res.status(403).json({ message: "Acesso negado" })
     }
 
-    const dataToUpdate = {
-      name,
-      email,
+    const dataToUpdate = {}
+
+    if (name !== undefined) {
+      if (!hasText(name)) {
+        return res.status(400).json({ message: "Nome nao pode ser vazio" })
+      }
+
+      dataToUpdate.name = normalizeText(name)
     }
 
-    if (password) {
+    if (email !== undefined) {
+      if (!hasText(email)) {
+        return res.status(400).json({ message: "Email nao pode ser vazio" })
+      }
+
+      dataToUpdate.email = normalizeText(email)
+    }
+
+    if (password !== undefined) {
+      if (!hasText(password)) {
+        return res.status(400).json({ message: "Senha nao pode ser vazia" })
+      }
+
       dataToUpdate.password = await bcryptLib.hash(password, 10)
     }
 
-    if (isAdmin) {
+    if (isAdmin && role !== undefined) {
       dataToUpdate.role = role
+    }
+
+    if (Object.keys(dataToUpdate).length === 0) {
+      return res.status(400).json({ message: "Nenhum campo valido informado" })
     }
 
     try {
@@ -74,7 +98,14 @@ export function createUserController({
   }
 
   async function criarUsuarioAdmin(req, res) {
-    const { name, email, password, role } = req.body
+    const name = normalizeText(req.body.name)
+    const email = normalizeText(req.body.email)
+    const password = typeof req.body.password === "string" ? req.body.password : ""
+    const { role } = req.body
+
+    if (!name || !email || !hasText(password)) {
+      return res.status(400).json({ message: "Nome, email e senha sao obrigatorios" })
+    }
 
     try {
       const userExists = await findUserByEmailFn(email)

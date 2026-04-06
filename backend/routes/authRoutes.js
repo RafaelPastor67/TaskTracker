@@ -15,7 +15,9 @@ router.post("/login", login)
 router.get("/me", verifyToken, (req, res) => {
   res.json({ user: req.user })
 })
-router.get("/admin", verifyToken,verifyAdmin)
+router.get("/admin", verifyToken, verifyAdmin, (req, res) => {
+  res.json({ authorized: true, user: req.user })
+})
 
 
 //CRUD User

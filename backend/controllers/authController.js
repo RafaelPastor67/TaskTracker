@@ -6,6 +6,8 @@ import dotenv from "dotenv" // carrrega a palavra secreta do JWT
 dotenv.config({ path: ".env" })// carrrega a palavra secreta do JWT -
 
 const secret = process.env.JWT_SECRET // armazena a chave
+const normalizeText = (value) => (typeof value === "string" ? value.trim() : "")
+const hasText = (value) => normalizeText(value).length > 0
 
 export function createAuthController({ //Fabrica pros testes
   createUserFn = createUser,
@@ -16,7 +18,14 @@ export function createAuthController({ //Fabrica pros testes
 } = {}) 
 {
   const register = async (req, res) => {
-    const { name, email, password } = req.body
+    const name = normalizeText(req.body.name)
+    const email = normalizeText(req.body.email)
+    const password = typeof req.body.password === "string" ? req.body.password : ""
+
+    if (!name || !email || !hasText(password)) {
+      return res.status(400).json({ message: "Name, email and password are required" })
+    }
+
     const userExists = await findUserByEmailFn(email)
     if (userExists) return res.status(400).json({ message: "Email already used" })
 
@@ -32,7 +41,13 @@ export function createAuthController({ //Fabrica pros testes
   }
 
   const login = async (req, res) => {
-    const { email, password } = req.body
+    const email = normalizeText(req.body.email)
+    const password = typeof req.body.password === "string" ? req.body.password : ""
+
+    if (!email || !hasText(password)) {
+      return res.status(400).json({ message: "Email and password are required" })
+    }
+
     const user = await findUserByEmailFn(email)
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" })

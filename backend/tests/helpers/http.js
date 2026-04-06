@@ -1,10 +1,11 @@
 export function createMockReq({
   body = {},
   params = {},
+  query = {},
   headers = {},
   user = undefined,
 } = {}) {
-  return { body, params, headers, user }
+  return { body, params, query, headers, user }
 }
 
 export function createMockRes() {

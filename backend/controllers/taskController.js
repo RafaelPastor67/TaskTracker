@@ -1,15 +1,29 @@
-import { createTask, getTasksByUser, deleteTask, updateTaskStatus } from "../models/taskModel.js"
+import { createTask, getTasksByProject, deleteTask, updateTaskStatus } from "../models/taskModel.js"
+import { getProjectById } from "../models/projectModel.js"
 
 export function createTaskControllerHandlers({
   createTaskFn = createTask,
-  getTasksByUserFn = getTasksByUser,
+  getTasksByProjectFn = getTasksByProject,
   deleteTaskFn = deleteTask,
   updateTaskStatusFn = updateTaskStatus,
+  getProjectByIdFn = getProjectById,
 } = {}) {
   const getTasks = async (req, res) => {
     try {
       const user_id = req.user.id
-      const tasks = await getTasksByUserFn(user_id)
+      const project_id = Number(req.query.projectId)
+
+      if (!project_id) {
+        return res.status(400).json({ error: "projectId is required" })
+      }
+
+      const project = await getProjectByIdFn(project_id, user_id)
+
+      if (!project) {
+        return res.status(404).json({ error: "Projeto nao encontrado" })
+      }
+
+      const tasks = await getTasksByProjectFn(project_id, user_id)
       res.json(tasks)
     } catch {
       res.status(500).json({ error: "Erro ao buscar tasks" })
@@ -18,15 +32,31 @@ export function createTaskControllerHandlers({
 
   const createTaskController = async (req, res) => {
     try {
-      const { title } = req.body
+      const title = req.body.title?.trim()
+      const project_id = Number(req.body.projectId)
       const user_id = req.user.id
-      const result = await createTaskFn({ title, user_id })
+
+      if (!title) {
+        return res.status(400).json({ error: "Titulo obrigatorio" })
+      }
+
+      if (!project_id) {
+        return res.status(400).json({ error: "projectId is required" })
+      }
+
+      const project = await getProjectByIdFn(project_id, user_id)
+
+      if (!project) {
+        return res.status(404).json({ error: "Projeto nao encontrado" })
+      }
+
+      const result = await createTaskFn({ title, project_id })
 
       res.status(201).json({
         id: result.insertId,
         title,
         completed: false,
-        user_id,
+        project_id,
       })
     } catch (err) {
       console.error("ERRO: ", err)
@@ -41,7 +71,7 @@ export function createTaskControllerHandlers({
       const result = await deleteTaskFn(id, user_id)
 
       if (result.affectedRows === 0) {
-        return res.status(404).json({ message: "Task não encontrada" })
+        return res.status(404).json({ message: "Task nao encontrada" })
       }
 
       res.json({ message: "Task deletada" })
@@ -59,7 +89,7 @@ export function createTaskControllerHandlers({
       const result = await updateTaskStatusFn(id, user_id, completed)
 
       if (result.affectedRows === 0) {
-        return res.status(404).json({ message: "Task não encontrada" })
+        return res.status(404).json({ message: "Task nao encontrada" })
       }
 
       res.json({ success: true })

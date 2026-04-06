@@ -2,6 +2,7 @@ import assert from "node:assert/strict"
 import { createAuthController } from "../controllers/authController.js"
 import { createAuthMiddleware } from "../middleware/authMiddleware.js"
 import { createUserController } from "../controllers/UserController.js"
+import { createProjectControllerHandlers } from "../controllers/projectController.js"
 import { createTaskControllerHandlers } from "../controllers/taskController.js"
 import { createMockReq, createMockRes } from "./helpers/http.js"
 
@@ -60,6 +61,27 @@ test("register rejects duplicated email", async () => {
 
   assert.equal(res.statusCode, 400)
   assert.deepEqual(res.body, { message: "Email already used" })
+})
+
+test("register requires name, email and password", async () => {
+  let createUserCalled = false
+  const controller = createAuthController({
+    findUserByEmailFn: async () => undefined,
+    createUserFn: async () => {
+      createUserCalled = true
+    },
+  })
+
+  const req = createMockReq({
+    body: { name: "   ", email: "rafael@example.com", password: "" },
+  })
+  const res = createMockRes()
+
+  await controller.register(req, res)
+
+  assert.equal(createUserCalled, false)
+  assert.equal(res.statusCode, 400)
+  assert.deepEqual(res.body, { message: "Name, email and password are required" })
 })
 
 test("login signs a token with the authenticated user payload", async () => {
@@ -130,6 +152,24 @@ test("login rejects invalid credentials", async () => {
   assert.deepEqual(res.body, { message: "Invalid credentials" })
 })
 
+test("login requires email and password", async () => {
+  const controller = createAuthController({
+    findUserByEmailFn: async () => {
+      throw new Error("findUserByEmail should not be called")
+    },
+  })
+
+  const req = createMockReq({
+    body: { email: "   ", password: "" },
+  })
+  const res = createMockRes()
+
+  await controller.login(req, res)
+
+  assert.equal(res.statusCode, 400)
+  assert.deepEqual(res.body, { message: "Email and password are required" })
+})
+
 test("verifyToken stores decoded user and calls next", async () => {
   let nextCalled = false
   const middleware = createAuthMiddleware({
@@ -185,6 +225,23 @@ test("verifyAdmin rejects non-admin users", async () => {
   assert.equal(nextCalled, false)
   assert.equal(res.statusCode, 403)
   assert.deepEqual(res.body, { message: "Acesso negado" })
+})
+
+test("verifyAdmin allows admin users", async () => {
+  let nextCalled = false
+  const middleware = createAuthMiddleware({
+    findUserByIdFn: async () => ({ id: 8, role: "admin" }),
+  })
+
+  const req = createMockReq({ user: { id: 8 } })
+  const res = createMockRes()
+
+  await middleware.verifyAdmin(req, res, () => {
+    nextCalled = true
+  })
+
+  assert.equal(nextCalled, true)
+  assert.equal(res.statusCode, 200)
 })
 
 test("deletarUsuario blocks non-admin from deleting another account", async () => {
@@ -247,6 +304,33 @@ test("atualizarUsuarios does not allow self role escalation", async () => {
   assert.equal(res.statusCode, 200)
 })
 
+test("atualizarUsuarios rejects empty profile fields", async () => {
+  let updateCalled = false
+  const controller = createUserController({
+    updateUserByIdFn: async () => {
+      updateCalled = true
+    },
+    bcryptLib: {
+      hash: async () => "hashed",
+    },
+  })
+
+  const req = createMockReq({
+    params: { id: "5" },
+    body: {
+      name: "   ",
+    },
+    user: { id: 5, role: "user" },
+  })
+  const res = createMockRes()
+
+  await controller.atualizarUsuarios(req, res)
+
+  assert.equal(updateCalled, false)
+  assert.equal(res.statusCode, 400)
+  assert.deepEqual(res.body, { message: "Nome nao pode ser vazio" })
+})
+
 test("criarUsuarioAdmin hashes password and preserves requested role", async () => {
   const controller = createUserController({
     findUserByEmailFn: async () => undefined,
@@ -274,6 +358,133 @@ test("criarUsuarioAdmin hashes password and preserves requested role", async () 
     email: "admin@example.com",
     password: "hashed:123456",
     role: "admin",
+  })
+})
+
+test("criarUsuarioAdmin requires name, email and password", async () => {
+  let createUserCalled = false
+  const controller = createUserController({
+    findUserByEmailFn: async () => undefined,
+    createUserFn: async () => {
+      createUserCalled = true
+    },
+    bcryptLib: {
+      hash: async () => "hashed",
+    },
+  })
+
+  const req = createMockReq({
+    body: {
+      name: "Admin",
+      email: "   ",
+      password: "   ",
+      role: "admin",
+    },
+  })
+  const res = createMockRes()
+
+  await controller.criarUsuarioAdmin(req, res)
+
+  assert.equal(createUserCalled, false)
+  assert.equal(res.statusCode, 400)
+  assert.deepEqual(res.body, { message: "Nome, email e senha sao obrigatorios" })
+})
+
+test("createProjectController trims the name and scopes the project to the user", async () => {
+  let receivedPayload
+  const controller = createProjectControllerHandlers({
+    createProjectFn: async (payload) => {
+      receivedPayload = payload
+      return { insertId: 12 }
+    },
+  })
+
+  const req = createMockReq({
+    body: { name: "  Trabalho  " },
+    user: { id: 8 },
+  })
+  const res = createMockRes()
+
+  await controller.createProjectController(req, res)
+
+  assert.deepEqual(receivedPayload, {
+    name: "Trabalho",
+    user_id: 8,
+  })
+  assert.equal(res.statusCode, 201)
+  assert.deepEqual(res.body, {
+    id: 12,
+    name: "Trabalho",
+    user_id: 8,
+  })
+})
+
+test("createProjectController rejects duplicate names for the same user", async () => {
+  const controller = createProjectControllerHandlers({
+    createProjectFn: async () => {
+      const error = new Error("duplicate")
+      error.code = "ER_DUP_ENTRY"
+      throw error
+    },
+  })
+
+  const req = createMockReq({
+    body: { name: "Trabalho" },
+    user: { id: 8 },
+  })
+  const res = createMockRes()
+
+  await controller.createProjectController(req, res)
+
+  assert.equal(res.statusCode, 409)
+  assert.deepEqual(res.body, { error: "Projeto com esse nome ja existe" })
+})
+
+test("getTasks requires a valid project owned by the authenticated user", async () => {
+  const controller = createTaskControllerHandlers({
+    getProjectByIdFn: async () => undefined,
+  })
+
+  const req = createMockReq({
+    query: { projectId: "4" },
+    user: { id: 99 },
+  })
+  const res = createMockRes()
+
+  await controller.getTasks(req, res)
+
+  assert.equal(res.statusCode, 404)
+  assert.deepEqual(res.body, { error: "Projeto nao encontrado" })
+})
+
+test("createTaskController stores the task inside the selected project", async () => {
+  let createTaskPayload
+  const controller = createTaskControllerHandlers({
+    getProjectByIdFn: async (projectId, userId) => ({ id: Number(projectId), user_id: userId }),
+    createTaskFn: async (payload) => {
+      createTaskPayload = payload
+      return { insertId: 22 }
+    },
+  })
+
+  const req = createMockReq({
+    body: { title: "  Revisar contrato  ", projectId: 4 },
+    user: { id: 99 },
+  })
+  const res = createMockRes()
+
+  await controller.createTaskController(req, res)
+
+  assert.deepEqual(createTaskPayload, {
+    title: "Revisar contrato",
+    project_id: 4,
+  })
+  assert.equal(res.statusCode, 201)
+  assert.deepEqual(res.body, {
+    id: 22,
+    title: "Revisar contrato",
+    completed: false,
+    project_id: 4,
   })
 })
 
@@ -319,7 +530,7 @@ test("updateTask returns 404 when the task does not belong to the user", async (
   await controller.updateTask(req, res)
 
   assert.equal(res.statusCode, 404)
-  assert.deepEqual(res.body, { message: "Task não encontrada" })
+  assert.deepEqual(res.body, { message: "Task nao encontrada" })
 })
 
 test("deleteTaskController returns 404 when no task is deleted", async () => {
@@ -336,7 +547,7 @@ test("deleteTaskController returns 404 when no task is deleted", async () => {
   await controller.deleteTaskController(req, res)
 
   assert.equal(res.statusCode, 404)
-  assert.deepEqual(res.body, { message: "Task não encontrada" })
+  assert.deepEqual(res.body, { message: "Task nao encontrada" })
 })
 
 let passed = 0
